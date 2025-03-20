@@ -1,0 +1,42 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+    background-color: #f4f4f4;
+}
+
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #6a0dad;
+    color: white;
+    padding: 15px;
+    border-radius: 8px;
+}
+
+header a {
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.pedidos-list {
+    margin-top: 20px;
+}
+
+.pedido-card {
+    background: white;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 15px;
+}
+
+.pedido-card h4 {
+    margin-bottom: 5px;
+    color: #6a0dad;
+}
+
+.pedido-card ul {
+    padding-left: 20px;
+}

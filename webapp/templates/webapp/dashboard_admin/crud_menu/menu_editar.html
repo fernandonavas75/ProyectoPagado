@@ -1,0 +1,57 @@
+{% extends 'cabezal.html' %}
+
+{% block title %}
+    <title>Editar Producto</title>
+{% endblock %}
+
+{% block secciones_pagina_web_staff %}
+    {{ block.super }}
+    <span class="navbar-text me-3">👤 Bienvenido, <strong>{{ nombre_usuario }}</strong></span>
+    <a href="{% url 'dashboard_admin_gestion_menu' %}" class="btn btn-secondary">
+        <i class="fas fa-arrow-left"></i> Volver al Menú
+    </a>
+{% endblock %}
+
+{% block contenido_pagina %}
+<div class="container mt-4">
+    <h2 class="text-center mb-4">✏️ Editar Producto</h2>
+    <div class="card p-4 shadow">
+        <h3 class="text-center">📋 Detalles del Producto</h3>
+        <form method="POST">
+            {% csrf_token %}
+            <input type="hidden" name="productoId" value="{{ producto.id }}">
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="nombrePlato" class="form-label">Nombre del Producto</label>
+                    <input type="text" name="nombrePlato" class="form-control" value="{{ producto.nombre_plato }}" required>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="precioPlato" class="form-label">Precio ($)</label>
+                    <input type="double" name="precioPlato" class="form-control" value="{{ producto.precio }}" required>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label for="descripcionPlato" class="form-label">Descripción</label>
+                <textarea name="descripcionPlato" class="form-control" rows="2" required>{{ producto.descripcion }}</textarea>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="cantidadPlato" class="form-label">Cantidad Disponible</label>
+                    <input type="number" name="cantidadPlato" class="form-control" value="{{ producto.cantidad_disponible }}" required>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="imagenPlato" class="form-label">URL de la Imagen</label>
+                    <input type="text" name="imagenPlato" class="form-control" value="{{ producto.imagen }}" required>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100">
+                <i class="fas fa-save"></i> Guardar Cambios
+            </button>
+        </form>
+    </div>
+</div>
+{% endblock %}

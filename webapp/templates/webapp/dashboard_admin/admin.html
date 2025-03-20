@@ -1,0 +1,48 @@
+{% extends 'cabezal.html' %}
+
+{% block titulo %}
+    <title>Dashboard | Admin</title>
+{% endblock %}
+
+{% block secciones_pagina_web_staff %}
+    {{ block.super }}
+    <span class="navbar-text me-3">👤 Bienvenido, <strong>{{ nombre_usuario }}</strong></span>
+{% endblock %}
+
+{% block contenido_pagina %}
+    <div class="container mt-4">
+        <h2 class="text-center mb-4"><i class="fas fa-cogs"></i> Panel de Administración</h2>
+
+        <div class="row row-cols-1 row-cols-md-2 g-4 justify-content-center">
+            <div class="col d-flex">
+                <a href="{% url 'dashboard_admin_gestion_menu' %}" class="admin-card card shadow p-3 text-center w-100">
+                    <h4>📖 Gestión del Menú</h4>
+                </a>
+            </div>
+            <div class="col d-flex">
+                <a href="{% url 'dashboard_admin_gestion_pedidos' %}"
+                   class="admin-card card shadow p-3 text-center w-100">
+                    <h4>📦 Pedidos en Tiempo Real</h4>
+                </a>
+            </div>
+            <div class="col d-flex">
+                <a href="{% url 'dashboard_admin_gestion_recargas' %}"
+                   class="admin-card card shadow p-3 text-center w-100">
+                    <h4>💳 Recarga de Saldo</h4>
+                </a>
+            </div>
+            <div class="col d-flex">
+                <a href="{% url 'dashboard_admin_gestion_balance' %}"
+                   class="admin-card card shadow p-3 text-center w-100">
+                    <h4>📊 Balance Diario</h4>
+                </a>
+            </div>
+            <div class="col d-flex">
+                <a href="{% url 'dashboard_admin_gestion_usuarios' %}"
+                   class="admin-card card shadow p-3 text-center w-100">
+                    <h4>🙍Gestion de usuarios</h4>
+                </a>
+            </div>
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,109 @@
+{% extends 'cabezal.html' %}
+
+{% block title %}
+    <title>Gestión del Menú</title>
+{% endblock %}
+
+{% block secciones_pagina_web_staff %}
+    {{ block.super }}
+    <span class="navbar-text me-3">👤 Bienvenido, <strong>{{ nombre_usuario }}</strong></span>
+    <a href="{% url 'dashboard_admin' %}" class="btn btn-secondary">
+        <i class="fas fa-arrow-left"></i> Volver al Dashboard
+    </a>
+{% endblock %}
+
+{% block contenido_pagina %}
+    <div class="container mt-4">
+        <h2 class="text-center mb-4">🍽️ Gestión del Menú</h2>
+
+        <!-- Botón para agregar un nuevo producto -->
+        <div class="d-flex justify-content-end mb-3">
+            <a href="{% url 'dashboard_admin_gestion_menu_agregar' %}" class="btn btn-success">
+                <i class="fas fa-plus"></i> Agregar Producto
+            </a>
+        </div>
+
+        <!-- Tabla de Productos Disponibles -->
+        <div class="card p-4 shadow">
+            <h3 class="text-center mb-3">📦 Productos Disponibles</h3>
+            <div class="table-responsive">
+                <table class="table table-striped table-hover">
+                    <thead class="table-dark">
+                    <tr>
+                        <th>ID</th>
+                        <th>Nombre</th>
+                        <th>Descripción</th>
+                        <th>Precio ($)</th>
+                        <th>Stock</th>
+                        <th>Recomendado</th>
+                        <th>Imagen</th>
+                        <th>Acciones</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for producto in productos %}
+                        <tr>
+                            <td>{{ producto.id }}</td>
+                            <td>{{ producto.nombre_plato }}</td>
+                            <td>{{ producto.descripcion | truncatechars:40 }}</td>
+                            <td>${{ producto.precio | floatformat:2 }}</td>
+                            <td>{{ producto.cantidad_disponible }}</td>
+                            <td>
+                                {% if producto.recomendado %}
+                                    ✅ Sí
+                                {% else %}
+                                    ❌ No
+                                {% endif %}
+                            </td>
+                            <td>
+                                <img src="{{ producto.imagen }}" alt="{{ producto.nombre_plato }}" class="img-thumbnail"
+                                     width="50">
+                            </td>
+                            <td>
+                                <a href="{% url 'dashboard_admin_gestion_menu_editar' producto.id %}"
+                                   class="btn btn-warning">✏</a>
+
+                                <button class="btn btn-danger btn-sm" onclick="eliminarPlato({{ producto.id }})">🗑
+                                </button>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="8" class="text-center">No hay productos registrados.</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block jvscript_archivos %}
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <script>
+        const eliminarPlatoURL = "{% url 'eliminar_plato' %}";
+
+        async function eliminarPlato(platoId) {
+            if (!confirm("¿Seguro que quieres eliminar este producto?")) return;
+
+            const formData = new FormData();
+            formData.append("platoId", platoId);
+
+            try {
+                const response = await fetch(eliminarPlatoURL, {
+                    method: "POST",
+                    body: formData
+                });
+
+                const data = await response.json();
+                alert(data.message);
+                if (response.ok) {
+                    location.reload();
+                }
+            } catch (error) {
+                console.error("❌ Error al eliminar el plato:", error);
+            }
+        }
+    </script>
+{% endblock %}

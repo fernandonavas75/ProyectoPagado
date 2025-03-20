@@ -1,0 +1,88 @@
+/* ====== Reset Básico ====== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+/* ====== Fondo con Degradado ====== */
+body {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: #fff;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* ====== Header (Navbar) ====== */
+.navbar-custom {
+    background: rgba(118, 75, 162, 0.9);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    padding: 15px;
+}
+
+.navbar-custom .navbar-brand {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #fff;
+}
+
+.navbar-custom .btn-logout {
+    background-color: #ff4d4d;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    transition: background 0.3s;
+}
+
+.navbar-custom .btn-logout:hover {
+    background-color: #cc0000;
+}
+
+/* ====== Contenedor de las tarjetas ====== */
+.admin-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+    padding: 40px 20px;
+}
+
+/* ====== Estilo de Tarjetas ====== */
+.admin-card {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    text-decoration: none;
+    color: #333;
+    font-size: 1.2em;
+    font-weight: bold;
+    text-align: center;
+    width: 250px;
+    height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s, background 0.3s;
+}
+
+.admin-card:hover {
+    background: #764ba2;
+    color: white;
+    transform: scale(1.05);
+}
+
+/* ====== Responsividad ====== */
+@media (max-width: 768px) {
+    .navbar-custom {
+        text-align: center;
+    }
+
+    .admin-container {
+        flex-direction: column;
+        align-items: center;
+    }
+}

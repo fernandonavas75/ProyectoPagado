@@ -1,0 +1,68 @@
+{% extends 'cabezal.html' %}
+
+{% block secciones_pagina_web_staff %}
+    {{ block.super }}
+    <span class="navbar-text me-3">👤 Bienvenido, <strong>{{ nombre_usuario }}</strong></span>
+    <a href="{% url 'dashboard_admin' %}" class="btn btn-secondary">
+        <i class="fas fa-arrow-left"></i> Volver al Dashboard
+    </a>
+{% endblock %}
+
+
+{% block contenido_pagina %}
+    <div class="container mt-4">
+        <h2 class="text-center mb-4">👥 Gestión de Usuarios</h2>
+
+        <!-- Tabla de Usuarios -->
+        <div class="card p-4 shadow">
+            <h3 class="text-center mb-3">📋 Lista de Usuarios</h3>
+            <div class="table-responsive">
+                <table class="table table-striped table-hover">
+                    <thead class="table-dark">
+                    <tr>
+                        <th>ID</th>
+                        <th>Nombre</th>
+                        <th>Email</th>
+                        <th>Saldo ($)</th>
+                        <th>Acciones</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% if usuarios %}
+                        {% for usuario in usuarios %}
+                            <tr>
+                                <td>{{ usuario.id }}</td>
+                                <td>{{ usuario.first_name }} {{ usuario.last_name }}</td>
+                                <td>{{ usuario.email }}</td>
+                                <td>${{ usuario.saldo }}</td>
+                                <td>
+                                    <a href="{% url 'dashboard_admin_gestion_usuarios_editar' usuario.id %}"
+                                       class="btn btn-warning">
+                                        ✏
+                                    </a>
+                                    <button class="btn btn-danger" onclick="confirmarEliminar({{ usuario.id }})">
+                                        🗑
+                                    </button>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="5" class="text-center">No hay usuarios registrados.</td>
+                        </tr>
+                    {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- ✅ Script con URL dinámica de Django -->
+    <script>
+        function confirmarEliminar(usuarioId) {
+            if (confirm("¿Seguro que quieres eliminar este usuario?")) {
+                window.location.href = "{% url 'dashboard_admin_gestion_usuarios_eliminar' 0 %}".replace('0', usuarioId);
+            }
+        }
+    </script>
+{% endblock %}

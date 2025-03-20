@@ -1,0 +1,143 @@
+{% extends 'cabezal.html' %}
+
+{% block titulo %}
+    <title>Cliente | Menú</title>
+{% endblock %}
+
+{% block secciones_pagina_web_staff %}
+    {{ block.super }}
+    <span class="navbar-text me-3">👤 Bienvenido {{ nombre_usuario }}</span>
+{% endblock %}
+
+{% block contenido_pagina %}
+    <div class="container mt-4">
+        <h2 class="text-center mb-4">🛒 Menú de Productos</h2>
+
+        <!-- Sección de Saldo -->
+        <div class="card p-4 mb-4 shadow text-center">
+            <h3>💰 Saldo Disponible: <span id="saldo">{{ saldo }}</span></h3>
+        </div>
+
+        <!-- Sección de Productos -->
+        <div class="card p-4 shadow">
+            <h3 class="text-center">📋 Lista de Productos</h3>
+            <div class="row row-cols-1 row-cols-md-3 g-4">
+                {% for producto in productos %}
+                    <div class="col">
+                        <div class="card h-100 shadow-sm">
+                            <img src="{{ producto.imagen }}" class="card-img-top img-fluid"
+                                 alt="{{ producto.nombre_plato }}"
+                                 onerror="this.onerror=null; this.src='https://via.placeholder.com/150?text=Sin+Imagen';">
+
+                            <div class="card-body text-center">
+                                <h5 class="card-title">{{ producto.nombre_plato }}</h5>
+                                <p class="card-text">{{ producto.descripcion }}</p>
+                                <p class="fw-bold">💲 <span class="precio">{{ producto.precio|floatformat:2 }}</span></p>
+
+                                <!-- Botón de compra -->
+                                <button class="btn btn-success btn-comprar"
+                                        data-id="{{ producto.id }}"
+                                        data-precio="{{ producto.precio }}"
+                                        data-nombre="{{ producto.nombre_plato }}">
+                                    🛒 Comprar
+                                </button>
+
+                                <!-- Mensaje de error si el saldo es insuficiente -->
+                                <p class="text-danger mensaje-error mt-2 d-none">❌ Saldo insuficiente</p>
+                            </div>
+                        </div>
+                    </div>
+                {% empty %}
+                    <p class="text-center text-muted">No hay productos disponibles en este momento.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Confirmación -->
+    <div class="modal fade" id="modalConfirmacion" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <!-- Este div es necesario para evitar errores con Bootstrap -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-success" id="btnConfirmarCompra">✅ Confirmar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block jvscript_archivos %}
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        let saldoDisponible = parseFloat(document.getElementById("saldo").innerText) || 0;
+        let productoSeleccionado = null;
+
+        function actualizarEstadoBotones() {
+            document.querySelectorAll(".btn-comprar").forEach(boton => {
+                const precioProducto = parseFloat(boton.dataset.precio) || 0;
+                const mensajeError = boton.nextElementSibling;
+
+                if (saldoDisponible < precioProducto) {
+                    boton.disabled = true;
+                    mensajeError.classList.remove("d-none");
+                } else {
+                    boton.disabled = false;
+                    mensajeError.classList.add("d-none");
+                }
+            });
+        }
+
+        actualizarEstadoBotones();
+
+        // Guardar producto seleccionado y abrir modal
+        document.querySelectorAll(".btn-comprar").forEach(boton => {
+            boton.addEventListener("click", function () {
+                productoSeleccionado = boton;
+
+                // Mostrar el modal de confirmación
+                let modal = new bootstrap.Modal(document.getElementById("modalConfirmacion"));
+                modal.show();
+            });
+        });
+
+        // Confirmar compra al presionar el botón en el modal
+        document.getElementById("btnConfirmarCompra").addEventListener("click", function () {
+            if (!productoSeleccionado) return;
+
+            const productoId = productoSeleccionado.dataset.id;
+            const precioProducto = parseFloat(productoSeleccionado.dataset.precio) || 0;
+
+            if (saldoDisponible >= precioProducto) {
+                fetch("{% url 'realizar_pedido' %}", {
+                    method: "POST",
+                    body: JSON.stringify({producto_id: productoId, total: precioProducto}),
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRFToken": "{{ csrf_token }}"
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === "success") {
+                        alert(`✅ Pedido realizado: ${productoSeleccionado.dataset.nombre} por $${precioProducto.toFixed(2)}. Código: ${data.codigo_recogida}`);
+
+                        saldoDisponible -= precioProducto;
+                        document.getElementById("saldo").innerText = saldoDisponible.toFixed(2);
+                        actualizarEstadoBotones();
+                    } else {
+                        alert("❌ Error: " + data.message);
+                    }
+                })
+                .catch(error => console.error("Error:", error));
+            }
+
+            let modal = bootstrap.Modal.getInstance(document.getElementById("modalConfirmacion"));
+            modal.hide();
+        });
+    });
+</script>
+{% endblock %}

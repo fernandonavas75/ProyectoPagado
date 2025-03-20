@@ -1,0 +1,61 @@
+{% extends 'cabezal.html' %}
+
+{% block title %}
+    <title>Editar Usuario</title>
+{% endblock %}
+
+{% block secciones_pagina_web_staff %}
+    {{ block.super }}
+    <span class="navbar-text me-3">👤 Bienvenido, <strong>{{ nombre_usuario }}</strong></span>
+    <a href="{% url 'dashboard_admin_gestion_usuarios' %}" class="btn btn-secondary">
+        <i class="fas fa-arrow-left"></i> Volver a la Gestión de Usuarios
+    </a>
+{% endblock %}
+
+{% block contenido_pagina %}
+<div class="container mt-4">
+    <h2 class="text-center mb-4">✏️ Editar Usuario</h2>
+
+    <div class="card p-4 shadow">
+        <h3 class="text-center">📋 Datos del Usuario</h3>
+        <form method="POST">
+            {% csrf_token %}
+            <input type="hidden" name="usuarioId" value="{{ usuario.id }}">
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="first_name" class="form-label">Nombre</label>
+                    <input type="text" name="first_name" class="form-control" value="{{ usuario.first_name }}" required>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="last_name" class="form-label">Apellido</label>
+                    <input type="text" name="last_name" class="form-control" value="{{ usuario.last_name }}" required>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label for="email" class="form-label">Correo Electrónico</label>
+                <input type="email" name="email" class="form-control" value="{{ usuario.email }}" required>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="saldo" class="form-label">Saldo ($)</label>
+                    <input type="number" name="saldo" class="form-control" step="0.01" value="{{ usuario.saldo }}" required>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="is_active" class="form-label">Estado</label>
+                    <select name="is_active" class="form-control">
+                        <option value="True" {% if usuario.is_active %}selected{% endif %}>Activo</option>
+                        <option value="False" {% if not usuario.is_active %}selected{% endif %}>Inactivo</option>
+                    </select>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100">
+                <i class="fas fa-save"></i> Guardar Cambios
+            </button>
+        </form>
+    </div>
+</div>
+{% endblock %}

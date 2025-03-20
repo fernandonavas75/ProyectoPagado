@@ -1,0 +1,131 @@
+{% extends 'cabezal.html' %}
+
+{% block title %}
+    <title>Recargas de Saldo</title>
+{% endblock %}
+
+{% block secciones_pagina_web_staff %}
+    {{ block.super }}
+    <span class="navbar-text me-3">👤 Bienvenido, <strong>{{ nombre_usuario }}</strong></span>
+    <a href="{% url 'dashboard_admin' %}" class="btn btn-secondary">
+        <i class="fas fa-arrow-left"></i> Volver al Dashboard
+    </a>
+{% endblock %}
+
+{% block contenido_pagina %}
+<div class="container mt-4">
+    <h2 class="text-center mb-4">💰 Recargas de Saldo</h2>
+
+    <!-- Selección de Cliente -->
+    <div class="card p-4 mb-4 shadow">
+        <h3 class="text-center">👤 Seleccionar Cliente</h3>
+        <select id="clienteSelect" class="form-select">
+            <option value="">Seleccionar Cliente...</option>
+        </select>
+    </div>
+
+    <!-- Recarga de Saldo -->
+    <div class="card p-4 mb-4 shadow">
+        <h3 class="text-center">💵 Ingresar Monto de Recarga</h3>
+        <div class="mb-3">
+            <input type="number" id="montoRecarga" class="form-control" placeholder="Monto a Recargar">
+        </div>
+        <button onclick="realizarRecarga()" class="btn btn-primary w-100">
+            <i class="fas fa-wallet"></i> Realizar Recarga
+        </button>
+    </div>
+
+    <!-- Historial de Recargas -->
+    <div class="card p-4 shadow">
+        <h3 class="text-center">📜 Historial de Recargas</h3>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Usuario</th>
+                    <th>Fecha</th>
+                    <th>Monto</th>
+                </tr>
+            </thead>
+            <tbody id="historialRecargas">
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+
+{% block jvscript_archivos %}
+<script>
+    const obtenerClientesURL = "{% url 'api_lista_clientes' %}";
+    const realizarRecargaURL = "{% url 'api_realizar_recarga' %}";
+    const obtenerHistorialURL = "{% url 'api_historial_recargas' %}";
+
+    document.addEventListener("DOMContentLoaded", function () {
+        cargarClientes();
+        cargarHistorialRecargas();
+    });
+
+    function cargarClientes() {
+        fetch(obtenerClientesURL)
+            .then(response => response.json())
+            .then(data => {
+                const clienteSelect = document.getElementById("clienteSelect");
+                clienteSelect.innerHTML = '<option value="">Seleccionar Cliente...</option>';
+                data.clientes.forEach(cliente => {
+                    clienteSelect.innerHTML += `<option value="${cliente.id}">
+                        ${cliente.first_name} ${cliente.last_name} - (Saldo: $${cliente.saldo})
+                    </option>`;
+                });
+            })
+            .catch(error => console.error("Error al cargar clientes:", error));
+    }
+
+    function cargarHistorialRecargas() {
+        fetch(obtenerHistorialURL)
+            .then(response => response.json())
+            .then(data => {
+                const historialContainer = document.getElementById("historialRecargas");
+                historialContainer.innerHTML = "";
+                data.recargas.forEach(recarga => {
+                    historialContainer.innerHTML += `
+                        <tr>
+                            <td>${recarga.cliente}</td>
+                            <td>${recarga.fecha}</td>
+                            <td>$${recarga.monto}</td>
+                        </tr>`;
+                });
+            })
+            .catch(error => console.error("Error al cargar historial:", error));
+    }
+
+    function realizarRecarga() {
+        const clienteId = document.getElementById("clienteSelect").value;
+        const monto = document.getElementById("montoRecarga").value;
+
+        if (!clienteId || monto <= 0) {
+            alert("⚠ Debes seleccionar un cliente y un monto válido.");
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append("cliente_id", clienteId);
+        formData.append("monto", monto);
+
+        fetch(realizarRecargaURL, {
+            method: "POST",
+            body: formData,
+            headers: { "X-CSRFToken": "{{ csrf_token }}" }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === "success") {
+                alert(data.message);
+                cargarClientes();
+                cargarHistorialRecargas();
+            } else {
+                alert("⚠ " + data.message);
+            }
+        })
+        .catch(error => console.error("Error al realizar recarga:", error));
+    }
+</script>
+{% endblock %}

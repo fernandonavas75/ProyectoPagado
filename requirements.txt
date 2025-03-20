@@ -1,0 +1,7 @@
+asgiref==3.7.2
+Django==3.2.25
+pytz==2025.1
+sqlparse==0.4.4
+typing_extensions==4.7.1
+gunicorn==23.0.0
+whitenoise==6.5.0

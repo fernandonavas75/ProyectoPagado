@@ -1,0 +1,91 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bienvenido | Proyecto</title>
+    <link rel="stylesheet" href="{% static 'webapp/css/styles_general.css' %}">
+</head>
+<body>
+<div class="welcome-container">
+    <h1>Bienvenido a la Plataforma</h1>
+    <p>Selecciona tu perfil o regístrate:</p>
+
+    <div class="tab-container">
+        <button class="tab active" onclick="showTab('login')">Iniciar Sesión</button>
+        <button class="tab" onclick="showTab('register')">Registrarse</button>
+    </div>
+
+    <!-- Formulario de Inicio de Sesión -->
+    <div id="loginFormContainer" class="form-container">
+        <form id="loginForm" method="POST" action="{% url 'login' %}">
+            {% csrf_token %}
+            <input type="email" name="email" placeholder="Correo electrónico" required>
+            <input type="password" name="password" placeholder="Contraseña" required>
+            <button type="submit">Ingresar</button>
+        </form>
+        <p id="loginError" class="error-message"></p>
+    </div>
+
+    <!-- Formulario de Registro (Solo Clientes) -->
+    <div id="registerFormContainer" class="form-container hidden">
+        <form id="registerForm">
+            {% csrf_token %}
+            <input type="text" id="registerFirstName" placeholder="Nombre" required>
+            <input type="text" id="registerLastName" placeholder="Apellido" required>
+            <input type="email" id="registerEmail" placeholder="Correo electrónico" required>
+            <input type="password" id="registerPassword" placeholder="Contraseña" required>
+            <button type="submit">Registrarse</button>
+        </form>
+        <p id="registerError" class="error-message"></p>
+    </div>
+</div>
+
+<script>
+    function showTab(tab) {
+        document.getElementById("loginFormContainer").classList.add("hidden");
+        document.getElementById("registerFormContainer").classList.add("hidden");
+        document.querySelectorAll(".tab").forEach(btn => btn.classList.remove("active"));
+
+        if (tab === "login") {
+            document.getElementById("loginFormContainer").classList.remove("hidden");
+            document.querySelectorAll(".tab")[0].classList.add("active");
+        } else {
+            document.getElementById("registerFormContainer").classList.remove("hidden");
+            document.querySelectorAll(".tab")[1].classList.add("active");
+        }
+    }
+
+    // Manejo de Registro
+    document.getElementById("registerForm").addEventListener("submit", async function (event) {
+        event.preventDefault();
+
+        const firstName = document.getElementById("registerFirstName").value;
+        const lastName = document.getElementById("registerLastName").value;
+        const email = document.getElementById("registerEmail").value;
+        const password = document.getElementById("registerPassword").value;
+
+        const formData = new FormData();
+        formData.append("first_name", firstName);
+        formData.append("last_name", lastName);
+        formData.append("email", email);
+        formData.append("password", password);
+
+        const response = await fetch("{% url 'register' %}", {
+            method: "POST",
+            body: formData
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            alert("Registro exitoso. Ahora puedes iniciar sesión.");
+            showTab("login");  // Cambia a la pestaña de inicio de sesión
+        } else {
+            document.getElementById("registerError").innerText = data.message;
+        }
+    });
+</script>
+</body>
+</html>
